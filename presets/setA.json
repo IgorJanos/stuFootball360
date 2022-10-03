@@ -1,0 +1,19 @@
+{
+    "renderSize": [1920, 1080],
+    "scaleSize": [448, 448],
+    "compression": "png",
+    "nImages": 30000,
+    
+    "view": {
+        "pan": [-40, 40],
+        "tilt": [-25, -2],
+        "roll": [-2, 2],
+        "fov": [10, 50]
+    },
+
+    "distortion": "poly-2p",
+    "distortionParams": {
+        "k1": [-0.45, 0.12],
+        "epsK2": 0.02
+    }
+}
