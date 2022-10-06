@@ -398,7 +398,7 @@ DatasetSink::~DatasetSink()
     if (file && writtenCount > 0) {
         // Write the labels data
 
-        hsize_t         dims[2] = { 2, (hsize_t)writtenCount };
+        hsize_t         dims[2] = { (hsize_t)writtenCount, 2 };
         H5::DataSpace   lspace(2, dims);
         H5::DataSet     lset = file->createDataSet(
                                     "labels", H5::PredType::NATIVE_FLOAT, lspace
