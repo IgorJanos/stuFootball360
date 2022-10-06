@@ -16,6 +16,8 @@
 #include <QtCore>
 
 #include <opencv2/opencv.hpp>
+#include <H5Cpp.h>
+
 
 #include <sstream>
 #include <iostream>
@@ -30,6 +32,7 @@
 
 
 #include "mainwindow.h"
+
 
 
 #include "src/exporter.h"

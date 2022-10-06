@@ -57,7 +57,7 @@ QPair<QStringList, QStringList> loadSplitJson(QString filename)
         if (obj.contains("val") && obj["val"].isArray()) {
             auto items = obj["val"].toArray();
             for (int i=0; i<items.size(); i++) {
-                result.first.append(items[i].toString());
+                result.second.append(items[i].toString());
             }
         }
     }

@@ -159,12 +159,20 @@ class DatasetSink
 {
 protected:
 
-    int             totalCount;
-    int             writtenCount;
+    int                             totalCount;
+    int                             writtenCount;
+    QSize                           scaleSize;
+
+    QSharedPointer<H5::H5File>      file;
+    QSharedPointer<H5::Group>       groupImages;
 
 
 public:
-    DatasetSink(int atotalcount);
+    DatasetSink(
+            const char *afilename,
+            QSize ascalesize,
+            int atotalcount
+            );
     virtual ~DatasetSink();
 
     // Write

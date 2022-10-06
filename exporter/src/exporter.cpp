@@ -7,6 +7,9 @@
 //-----------------------------------------------------------------------------
 #include "pch.h"
 
+#include <QImageReader>
+
+
 namespace Exporter {
 
 
@@ -55,6 +58,9 @@ DatasetImageSource::DatasetImageSource(
     images(aimages),
     index(-1)
 {
+
+    QImageReader::setAllocationLimit(512 * 1024*1024);
+
 }
 
 
@@ -362,15 +368,25 @@ float InterpolatedFunction::getX(float y)
 //-----------------------------------------------------------------------------
 
 DatasetSink::DatasetSink(
+        const char *afilename,
+        QSize ascalesize,
         int atotalcount
         ) :
     totalCount(atotalcount),
-    writtenCount(0)
+    writtenCount(0),
+    scaleSize(ascalesize)
 {
+    // Open the file & make folder for images
+    file = makeNew<H5::H5File>(afilename, H5F_ACC_TRUNC);
+    groupImages = makeNew<H5::Group>(file->createGroup("images"));
+
 }
 
 DatasetSink::~DatasetSink()
 {
+    if (groupImages) {
+        groupImages->close();
+    }
 }
 
 bool DatasetSink::isComplete()
@@ -395,8 +411,28 @@ static cv::Mat toMat(QImage const &img, int format)
 
 void DatasetSink::write(QSharedPointer<RenderedImage> frame, CropSample sample)
 {
-    // TODO: ...
+    if (writtenCount >= totalCount) return ;
     writtenCount ++;
+
+    // Rescale & compress
+    cv::Mat     mFrame = toMat(frame->image, CV_8UC3);
+    cv::Mat     mConv, mFinal;
+
+    cv::cvtColor(mFrame, mConv, cv::COLOR_BGR2RGB);
+
+    int         h = mConv.cols;
+    int         w = mConv.rows;
+    if (scaleSize.width() != w || scaleSize.height() != h) {
+        cv::resize(
+                mConv, mFinal,
+                cv::Size(scaleSize.width(), scaleSize.height()),
+                0, 0, cv::INTER_AREA
+            );
+    } else {
+        mFinal = mConv;
+    }
+
+    cv::imwrite("test.jpg", mFinal);
 }
 
 
@@ -626,17 +662,27 @@ CropRenderer::~CropRenderer()
 {
     qDebug() << "Renderer destroyed";
 
-    if (texture) {
-        delete texture;
-        texture = nullptr;
-    }
-
-    if (texDistort) {
-        delete texDistort;
-        texDistort = nullptr;
-    }
-
     if (context) {
+        context->makeCurrent(surface);
+
+
+        if (texture) {
+            delete texture;
+            texture = nullptr;
+        }
+
+        if (texDistort) {
+            delete texDistort;
+            texDistort = nullptr;
+        }
+
+        if (program) {
+            program->destroy();
+            delete program;
+            program = nullptr;
+        }
+
+        context->doneCurrent();
         delete context;
         context = nullptr;
     }
@@ -644,12 +690,6 @@ CropRenderer::~CropRenderer()
     if (pixels) {
         free(pixels);
         pixels = nullptr;
-    }
-
-    if (program) {
-        program->destroy();
-        delete program;
-        program = nullptr;
     }
 }
 
@@ -661,7 +701,7 @@ bool CropRenderer::initialize()
     context->setFormat(surface->format());
     context->create();
     context->makeCurrent(surface);
-    context->functions()->initializeOpenGLFunctions();
+    context->extraFunctions()->initializeOpenGLFunctions();
 
     // Loadneme shaders
     program = new PinholeProgram(context->functions());
@@ -687,6 +727,7 @@ bool CropRenderer::initialize()
     f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rtTarget);
     f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, dsTarget);
     f->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     return true;
 }
 
@@ -826,7 +867,7 @@ QSharedPointer<RenderedImage> CropRenderer::render(
         }
 
         program->prepareView(sample, size.width(), size.height());
-        program->setArgs(1.0, QVector3D(0.0, 0.0, 0.0));
+        program->setArgs(1.0, QVector3D(1.0, 1.0, 1.0));
         program->setK(k);
         program->draw();
 

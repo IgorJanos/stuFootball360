@@ -8,7 +8,7 @@ CONFIG += c++11
 CONFIG += precompile_header
 CONFIG += link_pkgconfig
 
-PKGCONFIG += opencv4
+PKGCONFIG += opencv4 hdf5
 
 INCLUDEPATH += /Users/janos/.lib
 

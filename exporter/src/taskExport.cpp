@@ -69,30 +69,34 @@ bool taskExport(Args &args)
     Preset      preset;
     preset.read(args.inputPresetJson.c_str());
 
-    QString         outputFile;
+    std::string     outputFile;
     QStringList     imageList;
 
     // Are we doing training or validation set ?
     if (args.outputValidationH5.empty()) {
 
         // We're training
-        outputFile = args.outputTrainingH5.c_str();
+        outputFile = args.outputTrainingH5;
         imageList = images.first;
     } else {
 
         // We're validating
-        outputFile = args.outputValidationH5.c_str();
+        outputFile = args.outputValidationH5;
         imageList = images.second;
     }
 
     // How many images do we need ?
     int     nFiles = imageList.size();
     int     totalImages = preset.nImages;
+    if (nFiles <= 0) {
+        printf("Error: nFiles <= 0\n");
+        return false;
+    }
 
     // Cap the limit to 200
-    int     perImage = ceil(totalImages / nFiles);
+    int     perImage = ceil((float)totalImages / (float)nFiles);
     perImage = min(perImage, 200);
-    int     cycles = ceil(totalImages / (nFiles*perImage));
+    int     cycles = ceil((float)totalImages / (float)(nFiles*perImage));
 
 
     //----------------------------------------------------
@@ -102,12 +106,25 @@ bool taskExport(Args &args)
     auto s2 = makeNew<Exporter::Repeater>(s1, perImage);
     auto s3 = makeNew<Exporter::CycleCounter>(s2, cycles);
 
+
+    QSurfaceFormat      glFormat;
+    //glFormat.setVersion(3, 2);
+    //glFormat.setProfile(QSurfaceFormat::CompatibilityProfile);
+    //glFormat.setSamples(16);
+    QSurfaceFormat::setDefaultFormat(glFormat);
+
     auto offs = makeNew<QOffscreenSurface>();
     offs->create();
-    auto renderer = makeNew<Exporter::CropRenderer>(offs, preset.renderSize);
+
+
+    auto renderer = makeNew<Exporter::CropRenderer>(offs.get(), preset.renderSize);
 
     // TODO: params ...
-    auto sink = makeNew<Exporter::DatasetSink>(totalImages);
+    auto sink = makeNew<Exporter::DatasetSink>(
+                outputFile.c_str(),
+                preset.scaleSize,
+                totalImages
+            );
 
 
     printf("Starting export : %d images\n", totalImages);
