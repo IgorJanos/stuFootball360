@@ -369,17 +369,25 @@ float InterpolatedFunction::getX(float y)
 
 DatasetSink::DatasetSink(
         const char *afilename,
-        QSize ascalesize,
-        int atotalcount
+        Preset *apreset
         ) :
-    totalCount(atotalcount),
+    totalCount(apreset->nImages),
     writtenCount(0),
-    scaleSize(ascalesize)
+    scaleSize(apreset->scaleSize),
+    compression(apreset->compression)
 {
     // Open the file & make folder for images
     file = makeNew<H5::H5File>(afilename, H5F_ACC_TRUNC);
     groupImages = makeNew<H5::Group>(file->createGroup("images"));
 
+    // Fill in INFO
+    hsize_t         dims[1] = { (hsize_t)apreset->rawData.size() };
+    H5::DataSpace   dspace(1, dims);
+    H5::DataSet     dset = file->createDataSet(
+                        "info", H5::PredType::NATIVE_UINT8, dspace
+                        );
+    dset.write(apreset->rawData.data(), H5::PredType::NATIVE_UINT8);
+    dset.close();
 }
 
 DatasetSink::~DatasetSink()
@@ -412,7 +420,6 @@ static cv::Mat toMat(QImage const &img, int format)
 void DatasetSink::write(QSharedPointer<RenderedImage> frame, CropSample sample)
 {
     if (writtenCount >= totalCount) return ;
-    writtenCount ++;
 
     // Rescale & compress
     cv::Mat     mFrame = toMat(frame->image, CV_8UC3);
@@ -432,7 +439,34 @@ void DatasetSink::write(QSharedPointer<RenderedImage> frame, CropSample sample)
         mFinal = mConv;
     }
 
-    cv::imwrite("test.jpg", mFinal);
+    // Compress
+    std::vector<uchar>     data(1024*1024);
+    if (compression == "jpg") {
+        std::vector<int>        params;
+        params.push_back(cv::IMWRITE_JPEG_QUALITY);
+        params.push_back(100);
+
+        cv::imencode(".png", mFinal, data, params);
+    } else
+    if (compression == "png") {
+        cv::imencode(".png", mFinal, data);
+    }
+
+    // Store the file
+    if (groupImages) {
+        int dataSize = data.size();
+        std::string name = std::to_string(writtenCount);
+
+        hsize_t         dims[1] = { (hsize_t)dataSize };
+        H5::DataSpace   dspace(1, dims);
+        H5::DataSet     dset = groupImages->createDataSet(
+                            name.c_str(), H5::PredType::NATIVE_UINT8, dspace
+                            );
+        dset.write(data.data(), H5::PredType::NATIVE_UINT8);
+        dset.close();
+    }
+
+    writtenCount ++;
 }
 
 
@@ -867,7 +901,7 @@ QSharedPointer<RenderedImage> CropRenderer::render(
         }
 
         program->prepareView(sample, size.width(), size.height());
-        program->setArgs(1.0, QVector3D(1.0, 1.0, 1.0));
+        program->setArgs(1.0, QVector3D(0.0, 1.0, 1.0));
         program->setK(k);
         program->draw();
 

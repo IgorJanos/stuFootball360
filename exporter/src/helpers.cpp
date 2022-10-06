@@ -145,9 +145,11 @@ bool Preset::read(QString filename)
 {
     QFile       file(filename);
     if (file.open(QIODevice::ReadOnly)) {
-        QByteArray          fileData = file.readAll();
+
+        rawData = file.readAll();
+
         QJsonParseError     err;
-        QJsonDocument       json(QJsonDocument::fromJson(fileData, &err));
+        QJsonDocument       json(QJsonDocument::fromJson(rawData, &err));
 
         return read(json.object());
     }
@@ -187,6 +189,26 @@ bool Preset::read(const QJsonObject &json)
 
 
 
+
+//-----------------------------------------------------------------------------
+//  Random helpers
+//-----------------------------------------------------------------------------
+
+std::default_random_engine		generator(
+        std::chrono::system_clock::now().time_since_epoch().count()
+        );
+
+float uniform(QPair<float,float> args)
+{
+    std::uniform_real_distribution<float> d(args.first, args.second);
+    return d(generator);
+}
+
+float normal(float mean, float stddev)
+{
+    std::normal_distribution<float> d(mean, stddev);
+    return d(generator);
+}
 
 
 

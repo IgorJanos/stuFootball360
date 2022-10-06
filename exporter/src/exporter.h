@@ -165,14 +165,11 @@ protected:
 
     QSharedPointer<H5::H5File>      file;
     QSharedPointer<H5::Group>       groupImages;
+    QString                         compression;
 
 
 public:
-    DatasetSink(
-            const char *afilename,
-            QSize ascalesize,
-            int atotalcount
-            );
+    DatasetSink(const char *afilename, Preset *apreset);
     virtual ~DatasetSink();
 
     // Write

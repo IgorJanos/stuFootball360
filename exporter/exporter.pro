@@ -33,6 +33,7 @@ HEADERS += \
     src/args.h \
     src/exporter.h \
     src/helpers.h \
+    src/indicators.h \
     src/tasks.h
 
 FORMS += \

@@ -16,6 +16,9 @@ bool dirExists(QString path);
 QPair<QStringList, QStringList> loadSplitJson(QString filename);
 
 
+float uniform(QPair<float,float> args);
+float normal(float mean, float stddev);
+
 
 inline int min(int a, int b) { return (a < b ? a : b); }
 
@@ -29,10 +32,12 @@ class Preset
 {
 public:
 
-    QSize           renderSize;
-    QSize           scaleSize;
-    QString         compression;
-    int             nImages;
+    QByteArray              rawData;
+
+    QSize                   renderSize;
+    QSize                   scaleSize;
+    QString                 compression;
+    int                     nImages;
 
     // View
     QPair<float, float>     rangePan;

@@ -6,9 +6,31 @@
 //
 //-----------------------------------------------------------------------------
 #include "pch.h"
+#include "indicators.h"
+
+
+
+static float k2Fromk1(float k1)
+{
+    return 0.019*k1 + 0.805*k1*k1;
+}
+
+static void randomSample(Exporter::CropSample &sample, Preset &preset)
+{
+    // view
+    sample.p = uniform(preset.rangePan);
+    sample.t = uniform(preset.rangeTilt);
+    sample.r = uniform(preset.rangeRoll);
+    sample.fov = uniform(preset.rangeFOV);
+
+    // distortion
+    sample.k1 = uniform(preset.k1);
+    sample.k2 = k2Fromk1(sample.k1) + normal(0.0, preset.epsK2);
+}
 
 
 static bool executeExport(
+        Preset &preset,
         QSharedPointer<Exporter::PipelineSource<Exporter::Image>> source,
         QSharedPointer<Exporter::CropRenderer> renderer,
         QSharedPointer<Exporter::DatasetSink> sink
@@ -17,16 +39,35 @@ static bool executeExport(
 
     bool isComplete = false;
 
+
+    indicators::ProgressBar bar{
+        indicators::option::BarWidth{50},
+        //indicators::option::Start{"["},
+        //indicators::option::Fill{"="},
+        //indicators::option::Lead{">"},
+        //indicators::option::Remainder{" "},
+        //indicators::option::End{"]"},
+        indicators::option::PrefixText{"Rendering "},
+        indicators::option::ShowElapsedTime{true},
+        indicators::option::ShowRemainingTime{true},
+        indicators::option::ShowPercentage{true},
+        indicators::option::MaxProgress(preset.nImages)
+      };
+
+    bar.set_progress(0);
+
     // Exporting process
     source->reset();
     while (!isComplete) {
         if (source->hasCurrent()) {
+
 
             auto inputImage = source->current();
             if (inputImage) {
 
                 // TODO: random sampling
                 Exporter::CropSample    crop;
+                randomSample(crop, preset);
 
                 auto outputImage = renderer->render(inputImage, crop);
                 sink->write(outputImage, crop);
@@ -39,6 +80,7 @@ static bool executeExport(
 
             // advance
             source->next();
+            bar.tick();
 
         } else {
             isComplete = true;
@@ -120,17 +162,13 @@ bool taskExport(Args &args)
     auto renderer = makeNew<Exporter::CropRenderer>(offs.get(), preset.renderSize);
 
     // TODO: params ...
-    auto sink = makeNew<Exporter::DatasetSink>(
-                outputFile.c_str(),
-                preset.scaleSize,
-                totalImages
-            );
+    auto sink = makeNew<Exporter::DatasetSink>(outputFile.c_str(), &preset);
 
 
     printf("Starting export : %d images\n", totalImages);
 
     // Execute export !
-    executeExport(s3, renderer, sink);
+    executeExport(preset, s3, renderer, sink);
 
     printf("Export complete.\n");
 
