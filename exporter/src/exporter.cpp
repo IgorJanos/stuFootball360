@@ -388,10 +388,25 @@ DatasetSink::DatasetSink(
                         );
     dset.write(apreset->rawData.data(), H5::PredType::NATIVE_UINT8);
     dset.close();
+
+    // Alloc data
+    labelsData.reserve(2*apreset->nImages);
 }
 
 DatasetSink::~DatasetSink()
 {
+    if (file && writtenCount > 0) {
+        // Write the labels data
+
+        hsize_t         dims[2] = { 2, (hsize_t)writtenCount };
+        H5::DataSpace   lspace(2, dims);
+        H5::DataSet     lset = file->createDataSet(
+                                    "labels", H5::PredType::NATIVE_FLOAT, lspace
+                                );
+        lset.write(labelsData.data(), H5::PredType::NATIVE_FLOAT);
+        lset.close();
+    }
+
     if (groupImages) {
         groupImages->close();
     }
@@ -439,6 +454,10 @@ void DatasetSink::write(QSharedPointer<RenderedImage> frame, CropSample sample)
         mFinal = mConv;
     }
 
+    // Append labels data
+    labelsData.push_back(sample.k1);
+    labelsData.push_back(sample.k2);
+
     // Compress
     std::vector<uchar>     data(1024*1024);
     if (compression == "jpg") {
@@ -446,7 +465,7 @@ void DatasetSink::write(QSharedPointer<RenderedImage> frame, CropSample sample)
         params.push_back(cv::IMWRITE_JPEG_QUALITY);
         params.push_back(100);
 
-        cv::imencode(".png", mFinal, data, params);
+        cv::imencode(".jpg", mFinal, data, params);
     } else
     if (compression == "png") {
         cv::imencode(".png", mFinal, data);

@@ -42,11 +42,6 @@ static bool executeExport(
 
     indicators::ProgressBar bar{
         indicators::option::BarWidth{50},
-        //indicators::option::Start{"["},
-        //indicators::option::Fill{"="},
-        //indicators::option::Lead{">"},
-        //indicators::option::Remainder{" "},
-        //indicators::option::End{"]"},
         indicators::option::PrefixText{"Rendering "},
         indicators::option::ShowElapsedTime{true},
         indicators::option::ShowRemainingTime{true},

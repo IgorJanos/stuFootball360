@@ -167,6 +167,7 @@ protected:
     QSharedPointer<H5::Group>       groupImages;
     QString                         compression;
 
+    std::vector<float>              labelsData;
 
 public:
     DatasetSink(const char *afilename, Preset *apreset);

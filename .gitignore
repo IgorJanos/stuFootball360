@@ -31,7 +31,7 @@
 *.out
 *.app
 
-
+run/
 exporter/bin
 *.pro.user
 
