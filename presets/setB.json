@@ -2,7 +2,7 @@
     "renderSize": [1920, 1080],
     "scaleSize": [448, 448],
     "compression": "png",
-    "nImages": 30000,    
+    "nImages": 100000,    
     "view": {
         "pan": [-40, 40],
         "tilt": [-25, -2],
