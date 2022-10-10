@@ -33,6 +33,6 @@
 
 run/
 exporter/bin
-*.pro.user
 
 .DS_Store
+build-*

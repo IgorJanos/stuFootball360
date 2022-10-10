@@ -8,6 +8,10 @@ CONFIG += c++11
 CONFIG += precompile_header
 CONFIG += link_pkgconfig
 
+mac {
+  PKG_CONFIG = /opt/homebrew/bin/pkg-config
+}
+
 PKGCONFIG += opencv4 hdf5
 
 INCLUDEPATH += /Users/janos/.lib
