@@ -12,6 +12,12 @@ This dataset contains 268 panorama images, and was created using the PANONO pano
 | Dunajska Streda | 53               |
 
 
+Download the raw images from the following link:
+
+| File     | Images  | Download Link |
+| -------- | --------| ------------- |
+| Raw Data | 30,000  | [football360-raw.tar.gz](https://data.deepmagic.sk/fiit/football360/football360-raw.tar.gz) (7.7 GB) |
+
 
 ## Raw Image Probe
 
