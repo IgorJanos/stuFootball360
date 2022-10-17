@@ -44,6 +44,14 @@ The exporting process supports both polynomial and division models with adjustab
 
 The exported datasets with their respective configurations can be found in the following table.
 
+| Set name | Purpose    | Images  | Preset    | Download Link |
+| -------- | ---------- | ------- | --------- | ------------- |
+| A        | Training   | 30,000  | setA.json | |
+| B        | Training   | 100,000 | setB.json | |
+| C        | Training   | 300,000 | setC.json | |
+| V        | Validation | 10,000  | setD.json | |
+
+
 ## Exporting Process
 
 The exporting process consists of two steps:
@@ -75,15 +83,13 @@ Presets are defined as JSON files, and they contain the parameters relevant to t
     "renderSize": [1920, 1080],
     "scaleSize": [448, 448],
     "compression": "png",
-    "nImages": 30000,
-    
+    "nImages": 30000,    
     "view": {
         "pan": [-40, 40],
         "tilt": [-25, -2],
         "roll": [-2, 2],
         "fov": [10, 50]
     },
-
     "distortion": "poly-2p",
     "distortionParams": {
         "k1": [-0.45, 0.12],
