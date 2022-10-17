@@ -46,10 +46,10 @@ The exported datasets with their respective configurations can be found in the f
 
 | Set name | Purpose    | Images  | Preset    | Download Link |
 | -------- | ---------- | ------- | --------- | ------------- |
-| A        | Training   | 30,000  | [setA.json](presets/setA.json) | [football360-setA.h5](https://data.deepmagic.sk/data/fiit/football360/football360-setA.h5) (10.5 GB) |
-| B        | Training   | 100,000 | [setB.json](presets/setB.json) | [football360-setB.h5](https://data.deepmagic.sk/data/fiit/football360/football360-setB.h5) (35.2 GB) |
-| C        | Training   | 300,000 | [setC.json](presets/setC.json) | [football360-setC.h5](https://data.deepmagic.sk/data/fiit/football360/football360-setC.h5) (105.5 GB) |
-| V        | Validation | 10,000  | [setD.json](presets/setD.json) | [football360-setV.h5](https://data.deepmagic.sk/data/fiit/football360/football360-setV.h5) (3.5 GB) |
+| A        | Training   | 30,000  | [setA.json](presets/setA.json) | [football360-setA.h5](https://data.deepmagic.sk/fiit/football360/football360-setA.h5) (10.5 GB) |
+| B        | Training   | 100,000 | [setB.json](presets/setB.json) | [football360-setB.h5](https://data.deepmagic.sk/fiit/football360/football360-setB.h5) (35.2 GB) |
+| C        | Training   | 300,000 | [setC.json](presets/setC.json) | [football360-setC.h5](https://data.deepmagic.sk/fiit/football360/football360-setC.h5) (105.5 GB) |
+| V        | Validation | 10,000  | [setD.json](presets/setD.json) | [football360-setV.h5](https://data.deepmagic.sk/fiit/football360/football360-setV.h5) (3.5 GB) |
 
 
 ## Exporting Process
