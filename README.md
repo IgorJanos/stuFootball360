@@ -66,11 +66,17 @@ To split the input image folder execute the following command:
 ./exporter -in IMAGES_FOLDER -split 90;10 -os split.json
 ```
 
-To render the cropped distorted images using a preset execute the following command:
+To render the cropped distorted images using a preset execute the following command.
+Make sure to select either training or validation subset for output.
 
 ``` bash
 ./exporter -in IMAGES_FOLDER -is split.json -ip presets/setA.json \
-           -ot TRAINING_IMAGES.H5 -ov VALIDATION_IMAGES.H5
+           -ot TRAINING_IMAGES.H5
+```
+
+``` bash
+./exporter -in IMAGES_FOLDER -is split.json -ip presets/setA.json \
+           -ov VALIDATION_IMAGES.H5
 ```
 
 
