@@ -39,7 +39,7 @@ From the panorama images a high number of crop images conforming to the pinhole 
 
 ## Distortion Probe
 
-The exporting process supports both polynomial and division models with adjustable number of parameters. The probability distributions of the distortion parameters can be configured by a preset JSON file.
+The exporting process supports both polynomial distortion model with two parameters. The probability distributions of the distortion parameters can be configured by a preset JSON file.
 
 | Barrel | Pincushion |
 | ------- | ----- |
