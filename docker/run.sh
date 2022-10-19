@@ -17,6 +17,7 @@ docker run \
     --privileged \
     --shm-size 8g \
     -v "${CWD}/..":/workspace \
+    -v "/media/disk1/data/fiit/football360":/data \
     -e CUDA_VISIBLE_DEVICES="$DEVICE" \
     ${IMAGE_TAG} \
     "$@" || exit $?

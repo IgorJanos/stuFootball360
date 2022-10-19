@@ -36,3 +36,6 @@ exporter/bin
 
 .DS_Store
 build-*
+
+# Data folders
+data/
