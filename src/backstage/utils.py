@@ -6,9 +6,63 @@
 #
 #------------------------------------------------------------------------------
 
+import torch
 import cv2
 import numpy as np
+from tqdm import tqdm
 
+
+
+class AverageCounter:
+    def __init__(self):
+        self.reset()
+
+    def step(self, value):
+        self.sum += value
+        self.count += 1
+        self.avg = self.sum / self.count
+
+    def reset(self):
+        self.sum = 0
+        self.count = 0
+        self.avg = 0
+
+
+class Statistics:
+    def __init__(self, listNames):
+        self.items = {}
+        for k in listNames:
+            self.items[k] = AverageCounter()
+
+    def step(self, k, value):
+        self.items[k].step(value)
+
+    def reset(self):
+        for k in self.items:
+            self.items[k].reset()
+
+    def getAvg(self, listNames=None):
+        result = {}
+        if (listNames is None):
+            listNames = self.items.keys()
+        for k in listNames:
+            result[k] = self.items[k].avg
+        return result
+
+
+
+def k2FromK1(k1):
+    k2 = 0.019*k1 + 0.805*(k1**2)
+    return torch.cat([k1, k2], dim=1)
+
+
+def getTqdm(data, ncols=None):
+    return tqdm(
+                data, leave=False, 
+                bar_format='{l_bar}{bar:20}{r_bar}',
+                ncols=ncols,
+                ascii=True
+                )
 
 def rescale(image, scaleShape=(640,360)):
     return cv2.resize(image, scaleShape)

@@ -1,0 +1,22 @@
+train:
+  outputFolder: data/results/seta-densenet161
+
+  # Training params
+  itPerEpoch: 1000
+  epochs: 150
+  lr: 0.001
+  betas: [0.9, 0.999]
+  batchSize: 128
+
+  data:
+    folder: /data
+    numWorkers: 4
+    trainSet: A
+    valSet: V
+
+  model:
+    backbone: densenet161
+    nHidden: 256
+    
+  
+  

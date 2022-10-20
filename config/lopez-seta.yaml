@@ -1,8 +1,0 @@
-train:
-
-  data:
-    folder: /data
-    trainSet: A
-    valSet: V
-    
-  
