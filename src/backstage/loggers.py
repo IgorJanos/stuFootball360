@@ -85,12 +85,15 @@ class CsvLogger(Logger):
 
             if (self.lines == 0):
                 # CSV header
-                line = self.separator.join(["epoch"] + list(s.keys()))
+                line = self.separator.join(["epoch", "lr"] + list(s.keys()))
                 self.file.write(line + "\n")
 
             # Join all values
             values = [ "{}".format(s[k]) for k in s.keys() ]
-            values = [ "{}".format(epoch+1) ] + values
+            values = [ 
+                "{}".format(epoch+1),
+                "{}".format(self.trainer.opt.param_groups[0]['lr'])
+            ] + values
             line = self.separator.join(values)
             self.file.write(line + "\n")
             self.file.flush()

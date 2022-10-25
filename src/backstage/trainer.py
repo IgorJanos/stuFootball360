@@ -88,6 +88,9 @@ class Trainer:
             lr=conf["lr"],
             betas=conf["betas"]
         )     
+        self.scheduler = torch.optim.lr_scheduler.ExponentialLR(
+            self.opt, gamma=conf["lrDecay"]
+        )
 
         self.log = Loggers()
         self.stats = Statistics(['lossT', 'lossV', 'mdldT', 'mdldV'])
@@ -118,6 +121,8 @@ class Trainer:
             self.validationPass(i, model, self.dsVal.loader)
 
             self.log.epochEnd(i, self.stats)
+
+            self.scheduler.step()
 
         self.log.trainingEnd()
         
