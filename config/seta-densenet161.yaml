@@ -5,8 +5,8 @@ train:
   evalIndices: [10, 20, 30, 40]
 
   # Training params
-  itPerEpoch: 10
-  epochs: 1
+  itPerEpoch: 1000
+  epochs: 150
   lr: 0.001
   lrDecay: 0.98
   betas: [0.9, 0.999]
