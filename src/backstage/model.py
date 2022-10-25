@@ -113,4 +113,4 @@ class DistortionModel(nn.Module):
 
 
 def createModel(conf):
-    return None
+    return DistortionModel(conf)

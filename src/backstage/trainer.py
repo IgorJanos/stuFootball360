@@ -6,6 +6,7 @@
 #
 #------------------------------------------------------------------------------
 
+import os
 import torch
 
 from .loggers import Loggers
@@ -15,6 +16,7 @@ from .utils import getTqdm, Statistics, k2FromK1
 from .losses import MDLD
 
 from torch.utils.data import DataLoader
+from torchvision import transforms
 
 #------------------------------------------------------------------------------
 #   DataSource class
@@ -23,6 +25,10 @@ from torch.utils.data import DataLoader
 class DataSource:
     def __init__(self, conf, subset, batchSize):
         self.ds = FootballDataset(conf["folder"], conf[subset], asTensor=True)
+        self.transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
         self.loader = DataLoader(
             self.ds,
             batch_size=batchSize,
@@ -60,7 +66,7 @@ class Trainer:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         self.conf = conf
-        self.outputFolder = conf["outputFolder"]
+        self.outputFolder = conf["outputFolder"]       
         self.batchSize = conf["batchSize"]
 
         # Training params
@@ -68,11 +74,13 @@ class Trainer:
         self.itPerEpoch = conf["itPerEpoch"]
 
         # Data sources
+        self.shape = (224, 224)
         self.dsTrain = DataSource(conf["data"], "trainSet", self.batchSize)
         self.dsVal = DataSource(conf["data"], "valSet", self.batchSize)
 
         # Model
         self.model = createModel(conf["model"])
+        self.model = self.model.to(self.device)
 
         # Optimizer
         self.opt = torch.optim.Adam(
@@ -86,7 +94,12 @@ class Trainer:
 
         # Loss functions
         self.criterionL2 = torch.nn.MSELoss()
-        self.criterionMDLD = MDLD()
+        self.criterionMDLD = MDLD(shape=(640, 360), device=self.device)
+
+
+    def setup(self, loggers):
+        os.makedirs(self.outputFolder, exist_ok=True)
+        self.log = Loggers(loggers)
 
 
     def optimize(self):
@@ -100,11 +113,9 @@ class Trainer:
             self.stats.reset()
             self.log.epochStart(i, self.stats)
 
-            # Train
+            # Train & Validate
             self.trainingPass(i, model)
-
-            # Validate
-            self.validationPass(model, self.dsVal.loader)
+            self.validationPass(i, model, self.dsVal.loader)
 
             self.log.epochEnd(i, self.stats)
 
@@ -115,19 +126,20 @@ class Trainer:
         model.train()
 
         progress = getTqdm(range(self.itPerEpoch))
-        progress.set_description("Epoch {}".format(epoch+1))
+        progress.set_description("Train {}".format(epoch+1))
         for _ in progress:
 
             # Get next sample
             x, k = self.dsTrain.get()
-            x = x.to(model.device)
-            k = k.to(model.device)
+            x = x.to(self.device)
+            k = k.to(self.device)
+            x = self.dsTrain.transform(x)
 
             # Optimize one step
             self.opt.zero_grad()
             k_hat = model(x)
             loss = self.criterionL2(k_hat, k[:,0:1])
-            mdld = self.criterionMDLD(k2FromK1(k_hat), k)
+            mdld = self.criterionMDLD(k2FromK1(k_hat), k).mean()
             loss.backward()
             self.opt.step()
 
@@ -140,23 +152,28 @@ class Trainer:
 
 
 
-    def validationPass(self, model, data):
+    def validationPass(self, epoch, model, data):
         model.eval()
         with torch.no_grad():            
-            for (x, k) in data:
-                x = x.to(model.device)
-                k = k.to(model.device)
+            progress = getTqdm(data)
+            progress.set_description("Val   {}".format(epoch+1))
+            for (x, k) in progress:
+                x = x.to(self.device)
+                k = k.to(self.device)
+                x = self.dsTrain.transform(x)
 
                 # Compute the prediction
                 k_hat = model(x)
 
                 # Compute metrics
                 loss = self.criterionL2(k_hat, k[:,0:1])
-                mdld = self.criterionMDLD(k2FromK1(k_hat), k)
+                mdld = self.criterionMDLD(k2FromK1(k_hat), k).mean()
 
                 # Update stats
                 self.stats.step("lossV", loss.cpu().detach().item())
                 self.stats.step("mdldV", mdld.cpu().detach().item())
 
+                # Update progress info
+                progress.set_postfix(self.stats.getAvg(["lossV", "mdldV"]))
 
 

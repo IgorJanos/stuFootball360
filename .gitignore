@@ -39,3 +39,4 @@ build-*
 
 # Data folders
 data/
+__pycache__

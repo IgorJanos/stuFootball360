@@ -7,11 +7,12 @@
 #------------------------------------------------------------------------------
 
 import os
+from re import S
 import yaml
 import torch
 
 from backstage.trainer import Trainer
-
+from backstage.loggers import CsvLogger, ModelCheckpoint, ResultSampler, PSNR_SSIM_Sampler
 
 BASE_CONFIG_PATH="config"
 
@@ -28,12 +29,26 @@ def train():
 
 
 def trainSingleRun(configFile):
+
+    print("")
+    print("Training: ", configFile)
+
     with open(configFile, "r") as f:
         config = yaml.safe_load(f)
 
     # Load and execute training
-    trainer = Trainer(config)
-    trainer.optimizer()
+    trainer = Trainer(config["train"])
+    trainer.setup([
+        CsvLogger(trainer, "training.csv"),
+        ModelCheckpoint(trainer, singleFile=True),
+        ResultSampler(
+            trainer, 
+            scaleShape=(640, 360), 
+            indices=config["train"]["evalIndices"]
+        ),
+        PSNR_SSIM_Sampler(trainer)
+    ])
+    trainer.optimize()
 
 
 if (__name__ == "__main__"):

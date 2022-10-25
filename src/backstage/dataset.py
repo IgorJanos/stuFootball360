@@ -76,6 +76,8 @@ class FootballDataset(Dataset):
             self.info = json.loads(bytes(self.h5file.get("info")))
             self.labels = self.h5file.get("labels")
 
+            if (self.len > 1000): self.len = 1000
+
 
     def loadRaw(self, idx):
         groupImages = self.h5file["images"]

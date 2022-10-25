@@ -58,7 +58,7 @@ def k2FromK1(k1):
 
 def getTqdm(data, ncols=None):
     return tqdm(
-                data, leave=False, 
+                data, leave=True, 
                 bar_format='{l_bar}{bar:20}{r_bar}',
                 ncols=ncols,
                 ascii=True
@@ -107,3 +107,12 @@ def undistort(image: np.ndarray, k:np.ndarray, scaleShape=(640, 360)):
     # Undistort image
     result = cv2.remap(image, map1, map2, cv2.INTER_LINEAR)
     return result
+
+
+def toNumpyImage(tx: torch.Tensor):
+    y = tx.cpu().detach().numpy()
+    y = (255 * y).astype(np.uint8)
+    y = np.transpose(y, (1, 2, 0))
+    return y
+
+
