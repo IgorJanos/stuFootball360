@@ -2,7 +2,7 @@ train:
   outputFolder: data/results/setc-efficientnetb5
 
   # Eval 
-  evalIndices: [10, 20, 30, 40]
+  evalIndices: [4936, 6817, 9110, 9361, 6967, 2567]
 
   # Training params
   itPerEpoch: 1000
