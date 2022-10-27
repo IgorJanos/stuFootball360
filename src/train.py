@@ -21,7 +21,15 @@ def train():
         Select config YAMLs to train
     '''
     configs = [
-        "seta-densenet161.yaml"
+        #"seta-densenet161.yaml",
+        #"setb-densenet161.yaml",
+        #"setc-densenet161.yaml",
+        #"seta-resnet152.yaml",
+        #"setb-resnet152.yaml",
+        "setc-resnet152.yaml",
+        #"seta-efficientnetb5.yaml",
+        #"setb-efficientnetb5.yaml",
+        #"setc-efficientnetb5.yaml"
     ]
     for c in configs:
         trainSingleRun(os.path.join(BASE_CONFIG_PATH, c))
@@ -40,7 +48,7 @@ def trainSingleRun(configFile):
     trainer = Trainer(config["train"])
     trainer.setup([
         CsvLogger(trainer, "training.csv"),
-        ModelCheckpoint(trainer, singleFile=True),
+        ModelCheckpoint(trainer, singleFile=True, bestName="mdldV"),
         ResultSampler(
             trainer, 
             scaleShape=(640, 360), 

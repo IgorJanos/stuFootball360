@@ -150,9 +150,11 @@ class ModelCheckpoint(Logger):
             if (self.bestValue is None):
                 isBest = True
                 self.bestValue = value
+                print("  new best metric: {}: {:.10f}".format(self.bestName, self.bestValue))
             else:
                 if (value < self.bestValue):
                     self.bestValue = value
+                    print("  new best metric: {}: {:.10f}".format(self.bestName, self.bestValue))
                     isBest = True
 
         if (isBest):

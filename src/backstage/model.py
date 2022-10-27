@@ -34,8 +34,8 @@ def createResnet(backbone):
     else:
         return None, 0
 
-    numFeatures = model.classifier.in_features
-    model.classifier = nn.Sequential()
+    numFeatures = model.fc.in_features
+    model.fc = nn.Sequential()
     return model, numFeatures
 
 def createEfficientnet(backbone):
