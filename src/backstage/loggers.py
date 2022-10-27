@@ -138,7 +138,7 @@ class ModelCheckpoint(Logger):
         self.bestValue = None
 
     def trainingEnd(self):
-        self.saveCheckpoint("model-end.pt")
+        self.saveCheckpoint(os.path.join(self.folder, "model-end.pt"))
 
     def epochEnd(self, epoch, stats):
         
