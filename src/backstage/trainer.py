@@ -81,6 +81,7 @@ class Trainer:
         # Model
         self.model = createModel(conf["model"])
         self.model = self.model.to(self.device)
+        self.bestCheckpoint = None
 
         # Optimizer
         self.opt = torch.optim.Adam(

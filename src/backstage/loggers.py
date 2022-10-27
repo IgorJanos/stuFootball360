@@ -89,10 +89,10 @@ class CsvLogger(Logger):
                 self.file.write(line + "\n")
 
             # Join all values
-            values = [ "{}".format(s[k]) for k in s.keys() ]
+            values = [ "{:.10f}".format(s[k]) for k in s.keys() ]
             values = [ 
                 "{}".format(epoch+1),
-                "{}".format(self.trainer.opt.param_groups[0]['lr'])
+                "{:.10f}".format(self.trainer.opt.param_groups[0]['lr'])
             ] + values
             line = self.separator.join(values)
             self.file.write(line + "\n")
@@ -130,26 +130,46 @@ class WandBLogger(Logger):
 #------------------------------------------------------------------------------
 
 class ModelCheckpoint(Logger):
-    def __init__(self, trainer, singleFile=True):
+    def __init__(self, trainer, singleFile=True, bestName=None):
         self.trainer = trainer
         self.folder = trainer.outputFolder
         self.singleFile = singleFile
+        self.bestName = bestName
+        self.bestValue = None
 
     def trainingEnd(self):
-        self.saveCheckpoint("model.pt")
+        self.saveCheckpoint("model-end.pt")
 
     def epochEnd(self, epoch, stats):
-        if (self.singleFile):
-            self.saveCheckpoint("model.pt")
+        
+        isBest = False
+        if (self.bestName is None):
+            isBest = True
         else:
-            self.saveCheckpoint("checkpoint-{:04d}.pt".format(epoch+1))
+            value = stats[self.bestName]
+            if (self.bestValue is None):
+                isBest = True
+                self.bestValue = value
+            else:
+                if (value < self.bestValue):
+                    self.bestValue = value
+                    isBest = True
+
+        if (isBest):
+            if (self.singleFile):
+                fn = os.path.join(self.folder, "checkpoint.pt")
+            else:
+                fn = os.path.join(self.folder, "checkpoint-{:04d}.pt".format(epoch+1))
+
+            self.saveCheckpoint(fn)
+            self.trainer.bestCheckpoint = fn
 
     def saveCheckpoint(self, fn):
         checkpoint = {
             "model": self.trainer.model.state_dict(),
             "opt": self.trainer.opt.state_dict()
         }
-        torch.save(checkpoint, os.path.join(self.folder, fn))
+        torch.save(checkpoint, fn)
 
 
 
@@ -179,7 +199,15 @@ class ResultSampler(Logger):
 
     def trainingEnd(self):
 
-        print("")
+        if (os.path.isfile(self.trainer.bestCheckpoint)):
+            print("Loading best checkpoint: ", self.trainer.bestCheckpoint)
+            checkpoint = torch.load(self.trainer.bestCheckpoint, map_location=torch.device("cpu"))
+            self.trainer.model.load_state_dict(checkpoint["model"])
+            self.trainer.model = self.trainer.model.to(self.trainer.device)
+        else:
+            print("No best checkpoint.")
+            return None
+
         print("Sampling results: ")
 
         model = self.trainer.model

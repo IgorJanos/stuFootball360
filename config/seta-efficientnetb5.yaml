@@ -1,5 +1,5 @@
 train:
-  outputFolder: data/results/seta-densenet161
+  outputFolder: data/results/seta-efficientnetb5
 
   # Eval 
   evalIndices: [10, 20, 30, 40]
@@ -19,7 +19,7 @@ train:
     valSet: V
 
   model:
-    backbone: densenet161
+    backbone: efficientnet_b5
     nHidden: 256
     
   
