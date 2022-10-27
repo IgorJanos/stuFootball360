@@ -141,12 +141,13 @@ class ModelCheckpoint(Logger):
         self.saveCheckpoint(os.path.join(self.folder, "model-end.pt"))
 
     def epochEnd(self, epoch, stats):
+        s = stats.getAvg()
         
         isBest = False
         if (self.bestName is None):
             isBest = True
         else:
-            value = stats[self.bestName]
+            value = s[self.bestName]
             if (self.bestValue is None):
                 isBest = True
                 self.bestValue = value
