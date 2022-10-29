@@ -33,9 +33,6 @@
 
 	"mounts": [
 		"source=/media/disk1/data/fiit/football360,target=/data,type=bind,consistency=cached"
-	//	"source=/media/disk2/datasets/fingertips,target=/srv/datasets/fingertips,type=bind,readonly",
-	//	"source=/media/disk2/datasets/latent,target=/srv/datasets/latent,type=bind,readonly",
-	//	"source=/media/disk2/datasets/latent-nice,target=/srv/datasets/latent-nice,type=bind,readonly"
 	]
 
 	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
