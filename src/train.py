@@ -7,9 +7,7 @@
 #------------------------------------------------------------------------------
 
 import os
-from re import S
 import yaml
-import torch
 
 from backstage.trainer import Trainer
 from backstage.loggers import CsvLogger, ModelCheckpoint, ResultSampler, PSNR_SSIM_Sampler
