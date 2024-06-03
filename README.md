@@ -1,6 +1,10 @@
 # Football360
 
 This is the official repository for the Football360 dataset. The aim of this dataset is to aid the development and evaluation of computer vision algorithms, primarily the radial distortion correction algorithms, in the sports domain.
+The work presented here was published in the VISAPP 2023 conference.
+
+The original paper can be found at - https://www.scitepress.org/PublishedPapers/2023/116812/116812.pdf.
+
 
 This dataset contains 268 panorama images, and was created using the PANONO panoramic camera in 3 football arenas in Slovakia. Each arena was covered from numerous locations on all levels of the tribune, and broadcast camera platforms. The images capture regular football game, pitch maintenance, low/challenging lighting conditions, day and night situations.
 
@@ -16,7 +20,7 @@ Download the raw images from the following link:
 
 | File     | Images  | Download Link |
 | -------- | --------| ------------- |
-| Raw Data | 268  | [football360-raw.tar.gz](https://data.deepmagic.sk/fiit/football360/football360-raw.tar.gz) (7.7 GB) |
+| Raw Data | 268  | [football360-raw.tar.gz](https://vggnas.fiit.stuba.sk/download/datasets/football360/football360-raw.tar.gz) (7.7 GB) |
 
 
 ## Raw Image Probe
@@ -52,10 +56,10 @@ The exported datasets with their respective configurations can be found in the f
 
 | Set name | Purpose    | Images  | Preset    | Download Link |
 | -------- | ---------- | ------- | --------- | ------------- |
-| A        | Training   | 30,000  | [setA.json](presets/setA.json) | [football360-setA.h5](https://data.deepmagic.sk/fiit/football360/football360-setA.h5) (10.5 GB) |
-| B        | Training   | 100,000 | [setB.json](presets/setB.json) | [football360-setB.h5](https://data.deepmagic.sk/fiit/football360/football360-setB.h5) (35.2 GB) |
-| C        | Training   | 300,000 | [setC.json](presets/setC.json) | [football360-setC.h5](https://data.deepmagic.sk/fiit/football360/football360-setC.h5) (105.5 GB) |
-| V        | Validation | 10,000  | [setV.json](presets/setV.json) | [football360-setV.h5](https://data.deepmagic.sk/fiit/football360/football360-setV.h5) (3.5 GB) |
+| A        | Training   | 30,000  | [setA.json](presets/setA.json) | [football360-setA.h5](https://vggnas.fiit.stuba.sk/download/datasets/football360/football360-setA.h5) (10.5 GB) |
+| B        | Training   | 100,000 | [setB.json](presets/setB.json) | [football360-setB.h5](https://vggnas.fiit.stuba.sk/download/datasets/football360/football360-setB.h5) (35.2 GB) |
+| C        | Training   | 300,000 | [setC.json](presets/setC.json) | [football360-setC.h5](https://vggnas.fiit.stuba.sk/download/datasets/football360/football360-setC.h5) (105.5 GB) |
+| V        | Validation | 10,000  | [setV.json](presets/setV.json) | [football360-setV.h5](https://vggnas.fiit.stuba.sk/download/datasets/football360/football360-setV.h5) (3.5 GB) |
 
 
 ## Exporting Process
@@ -107,5 +111,25 @@ Presets are defined as JSON files, and they contain the parameters relevant to t
         "k1": [-0.45, 0.12],
         "epsK2": 0.02
     }
+}
+```
+
+
+## Citing Football360
+
+If you find Football360 useful in your research, please consider citing:
+
+```
+@conference{janos2023football,
+    author={Igor Jánoš. and Vanda Benešová.},
+    title={Football360: Introducing a New Dataset for Camera Calibration in Sports Domain},
+    booktitle={Proceedings of the 18th International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications (VISIGRAPP 2023) - Volume 4: VISAPP},
+    year={2023},
+    pages={301-308},
+    publisher={SciTePress},
+    organization={INSTICC},
+    doi={10.5220/0011681200003417},
+    isbn={978-989-758-634-7},
+    issn={2184-4321},
 }
 ```
